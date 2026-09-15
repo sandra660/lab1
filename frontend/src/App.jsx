@@ -13,13 +13,20 @@ const today = new Date().toLocaleDateString(undefined, {
 
 export default function App() {
   const [todos, setTodos] = useState([]);
+  const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTodos()
-      .then(data => { setTodos(data); setLoading(false); })
-      .catch(err => { console.error(err); setLoading(false); });
-  }, []);
+
+  const done = filter === 'all' ? undefined : filter === 'done';
+
+  fetchTodos(done)
+
+    .then(data => { setTodos(data); setLoading(false); })
+
+    .catch(err => { console.error(err); setLoading(false); });
+
+}, [filter]);
 
   const handleAdd = async (title) => {
     const newTodo = await createTodo(title);
@@ -50,7 +57,14 @@ export default function App() {
         </header>
 
         <TodoForm onAdd={handleAdd} />
-        <TodoList
+
+<div>
+  <button onClick={() => setFilter('all')}>All</button>
+  <button onClick={() => setFilter('active')}>Active</button>
+  <button onClick={() => setFilter('done')}>Done</button>
+</div>
+
+<TodoList
           todos={todos}
           loading={loading}
           onToggle={handleToggle}
